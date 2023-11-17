@@ -6,12 +6,8 @@ from shapely.geometry import Point
 
 class GeoprocessingManager:
     def __init__(self, original_data, attom_data):
-        self.original_data_points = [
-            (float(data['longitude']), float(data['latitude'])) for data in original_data
-        ]
-        self.attom_data_points = [
-            (float(data['longitude']), float(data['latitude'])) for data in attom_data
-        ]
+        self.original_data_points = [point for point in original_data.geometry]
+        self.attom_data_points = [point for point in attom_data.geometry]
     
     def filter_points_within_polygon(self, gdf_points, polygon):
         """Filter points that fall within the given polygon."""
@@ -35,7 +31,8 @@ class GeoprocessingManager:
         '''
         Build concave hull
         '''
-        return alphashape.alphashape(self.original_data_points, alpha)
+        points_as_tuples = [(point.x, point.y) for point in self.original_data_points]
+        return alphashape.alphashape(points_as_tuples, alpha)
 
     def points_within_radius(self, center_point, radius):
         if not isinstance(center_point, Point):

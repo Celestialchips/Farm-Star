@@ -1,3 +1,36 @@
-<iframe width="600" height="450" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
-src="https://www.arcgis.com/apps/Embed/index.html?webmap=ID?&extent=-117.20,34.055,-117.19,34.06&zoom=true&previewImage=false&scale=true&disable_scroll=true&theme=light">
-</iframe>
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.x/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.x/"></script>
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer"
+    ], function(Map, MapView, FeatureLayer) {
+      var map = new Map({
+        basemap: "streets-navigation-vector"
+      });
+
+      var view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [-98.5795, 39.8283],
+        zoom: 4
+      });
+
+      // Add your layers
+      var originalPointsLayer = new FeatureLayer({
+        url: "https://services6.arcgis.com/3tKBZy9r0mwAeNvJ/arcgis/rest/services/original_points_lv/FeatureServer"
+      });
+
+      map.add(originalPointsLayer);
+
+    });
+  </script>
+</head>
+<body>
+  <div id="viewDiv" style="height: 600px; width: 100%;"></div>
+</body>
+</html>

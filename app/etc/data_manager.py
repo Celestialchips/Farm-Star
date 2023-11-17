@@ -21,22 +21,21 @@ class DataManager:
         self.output_directory = output_directory
         os.makedirs(self.output_directory, exist_ok=True)
     
-    def save_all_attom_points_as_geojson(self, attom_data, filename="all_attom_points.geojson"):
-            for record in attom_data:
-                record['longitude'] = float(record['longitude'])
-                record['latitude'] = float(record['latitude'])
-            
-            gdf_all_attom_points = gpd.GeoDataFrame(
-                attom_data,
-                geometry=[Point(data['longitude'], data['latitude']) for data in attom_data]
-            )
-            gdf_all_attom_points.set_crs(epsg=4326, inplace=True)
+    def save_all_attom_points_as_geojson(self, gdf, filename="all_attom_points.geojson"):
+        """
+        Save a GeoDataFrame with point geometries to a GeoJSON file.
 
-            geojson_path = os.path.join(self.output_directory, filename)
-            
-            gdf_all_attom_points.to_file(geojson_path, driver='GeoJSON')
-
-            print(f"All ATTOM points saved successfully to {geojson_path}")
+        Parameters:
+        gdf (GeoDataFrame): The GeoDataFrame containing point geometries.
+        filename (str): The name of the file to save.
+        """
+        if gdf.crs is None:
+            gdf.set_crs(epsg=4326, inplace=True)
+        
+        geojson_path = os.path.join(self.output_directory, filename)
+        gdf.to_file(geojson_path, driver='GeoJSON')
+        
+        print(f"All ATTOM points saved successfully to {geojson_path}")
 
     def process_attom_data(attom_data_file_path, convex_hull_polygon):
         with open(attom_data_file_path, 'r') as file:
