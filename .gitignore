@@ -1,0 +1,5 @@
+.env
+/all_gen_figures
+/data
+*.pyc
+.DS_Store

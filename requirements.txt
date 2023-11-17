@@ -1,0 +1,11 @@
+pytest
+geopy
+python_dotenv
+shapely
+mysql-connector-python
+alphashape
+geopandas
+arcgis
+flake8
+pandas
+getpass
