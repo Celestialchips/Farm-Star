@@ -10,12 +10,12 @@ from app.geopoints.processing import GeoprocessingManager
 from app.etc.data_manager import DataManager
 from app.auth.arcg import GisUploader
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template
 
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 class Artemis:
     def __init__(self):
         self.settings = {
@@ -102,6 +102,14 @@ def process_data_endpoint():
         print(f"An unexpected error occurred: {e}")
         traceback.print_exc()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+@app.route('/home')
+def index():
+    return render_template('index.html')
+
+@app.route('/<path:path>')
+def catch_all(path):
+    return f'You want path: {path}'
 
 def main():
     config_manager = Artemis()
@@ -118,5 +126,5 @@ def main():
 if __name__ == '__main__':
     main()
     # not really sure how to change this to run the flask app WIP
-    if os.getenv('FLASK_ENV') == 'development':
-        app.run(debug=True)
+    # if os.getenv('FLASK_ENV') == 'development':
+    app.run(debug=True)
