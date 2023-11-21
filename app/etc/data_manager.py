@@ -6,7 +6,6 @@ import geopandas as gpd
 from shapely.geometry import Point
 from app.polygon.processing import PolygonCreator
 
-
 class DataManager:
     '''
     This class manages attom data processing
@@ -19,7 +18,7 @@ class DataManager:
     '''
     def __init__(self, output_directory):
         self.output_directory = output_directory
-        os.makedirs(self.output_directory, exist_ok=True)
+        # os.makedirs(self.output_directory, exist_ok=True)
     
     def save_all_attom_points_as_geojson(self, gdf, filename="all_attom_points.geojson"):
         """

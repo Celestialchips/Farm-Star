@@ -38,3 +38,12 @@ class DatabaseManager:
     def close_connection(self):
         if self.connection and self.connection.is_connected():
             self.connection.close()
+
+    def upload_gdf_to_database(self, gdf, table_name):
+        gdf['geometry'] = gdf['geometry'].apply(lambda x: x.wkt)
+        self.upload_data(table_name, gdf)
+    
+    def upload_data(self, table_name, gdf):
+        pass
+
+# Send Post request to 

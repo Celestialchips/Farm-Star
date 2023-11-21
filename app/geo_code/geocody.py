@@ -30,7 +30,7 @@ class Geocoder:
 
 def main(): 
     geocoder = Geocoder(os.getenv('OPENCAGE_API_KEY'))
-    with open('vegastestoffers.json', 'r') as file:
+    with open('lasvegasoffers.json', 'r') as file:
         data = json.load(file)
     
     for key, value in data.items():
@@ -42,7 +42,7 @@ def main():
         else:
             print(f"Could not geocode address: {address}")
     
-    with open('updated_vegastestoffers.json', 'w') as file:
+    with open('updated_lasvegasoffers.json', 'w') as file:
         json.dump(data, file, indent=4)
 
     return True
