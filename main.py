@@ -26,25 +26,6 @@ def load_config():
     return config
 
 # app = Flask(__name__, static_folder='static', template_folder='templates')
-# class Artemis:
-#     def __init__(self):
-#         self.settings = {
-#             'host': os.getenv('MYSQL_HOST'),
-#             'user': os.getenv('MYSQL_USER'),
-#             'password': os.getenv('MYSQL_PASSWORD'),
-#             'database': os.getenv('MYSQL_DATABASE'),
-#             'table_name_original': os.getenv('MYSQL_TABLE_1'),
-#             'table_name_attom': os.getenv('MYSQL_TABLE_2'),
-#             'esri_api_key': os.getenv('ESRI_API_KEY'),
-#             'output_dir': os.getenv('OUT_DIR')
-#         }
-
-    # def get_setting(self, key):
-    #     return self.settings.get(key)
-
-# def setup_output_directory(directory):
-#     if not os.path.exists(directory):
-#         os.makedirs(directory)
 
 def fetch_and_prepare_data(db_manager, table_name):
     data = db_manager.fetch_data(table_name)
@@ -130,17 +111,6 @@ def process_geodata(config):
     data_manager.save_all_attom_points_as_geojson(gdf_attom)
 
     db_manager.close_connection()
-
-# def empty_output_directory(directory):
-#     try:
-#         if os.path.exists(directory):
-#             shutil.rmtree(directory)
-#             os.makedirs(directory)
-#             print(f"Successfully emptied the output directory: {directory}")
-#         else:
-#             print(f"The directory does not exist: {directory}")
-#     except Exception as e:
-#         print(f"An error occurred while trying to empty the output directory: {e}")
 
 def main():
     config = load_config()
