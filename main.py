@@ -1,4 +1,5 @@
 import os
+import logging
 import traceback
 import requests
 import shutil
@@ -16,6 +17,7 @@ from app.etc.data_manager import DataManager
 from app.utils import Utility
 from dotenv import load_dotenv
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 load_dotenv()
 
@@ -76,7 +78,7 @@ def process_geodata(config):
         config['MYSQL_PASSWORD'],
         config['MYSQL_DATABASE']
     )
-    
+
     gdf_original = fetch_and_prepare_data(db_manager, config['MYSQL_TABLE_1'])
     gdf_attom = fetch_and_prepare_data(db_manager, config['MYSQL_TABLE_2'])
 
@@ -86,11 +88,15 @@ def process_geodata(config):
     gdf_manager = GeoDataFrameManager()
     geo_manager = GeoprocessingManager(gdf_original, gdf_attom)
 
-
     concave_hull, expanded_hull = generate_and_save_hulls(geo_manager, gdf_manager, config['OUT_DIR'])
+
+    filter_and_save_points(geo_manager, gdf_attom, concave_hull, config['OUT_DIR'], "filtered_points_concave.geojson")
+    filter_and_save_points(geo_manager, gdf_attom, expanded_hull, config['OUT_DIR'], "filtered_points_expanded.geojson")
 
     concave_hull_path = os.path.join(config['OUT_DIR'], "concave_hull.geojson")
     expanded_hull_path = os.path.join(config['OUT_DIR'], "expanded_hull.geojson")
+    filter_concave_hull_path = os.path.join(config['OUT_DIR'], "filtered_points_concave.geojson")
+    filter_expanded_hull_path = os.path.join(config['OUT_DIR'], "filtered_points_expanded.geojson")
 
     # with open(concave_hull_path, 'r') as file:
     #     concave_geojson = json.load(file)
@@ -100,11 +106,15 @@ def process_geodata(config):
     # }
     # print("Payload for concave hull:", json.dumps(concave_payload, indent=4))
 
-    post_coordinates_to_endpoint('https://1138-174-70-22-131.ngrok-free.app/polygons', concave_hull_path)
-    post_coordinates_to_endpoint('https://1138-174-70-22-131.ngrok-free.app/polygons', expanded_hull_path)
+    # post_coordinates_to_endpoint('https://1138-174-70-22-131.ngrok-free.app/polygons', concave_hull_path)
+    # post_coordinates_to_endpoint('https://1138-174-70-22-131.ngrok-free.app/polygons', expanded_hull_path)
 
     os.remove(concave_hull_path)
     os.remove(expanded_hull_path)
+    # os.remove(filter_concave_hull_path)
+    # os.remove(filter_expanded_hull_path)
+
+    logging.info("Step 3: Saving data")
 
     gdf_manager.save_gdf_as_geojson(gdf_original, config['OUT_DIR'], "original_points.geojson")
     data_manager = DataManager(output_directory=config['OUT_DIR'])
