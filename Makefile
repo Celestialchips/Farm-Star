@@ -1,7 +1,7 @@
 .PHONY: build-image run version push-dist-image start stop clean
 
 PWD := $(shell pwd)
-VER := $(shell git describe --tags) 
+VER := $(shell git describe --tags)
 BUILD_IMG := gk-lv-mkt
 CONTAINER_NAME := gk-lv-mkt
 MYSQL_PATH := /var/lib/mysql-files
