@@ -1,37 +1,144 @@
-<!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <link rel="stylesheet" href="https://js.arcgis.com/4.x/esri/css/main.css">
-  <script src="https://js.arcgis.com/4.x/"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>GeoJSONLayer | Sample | ArcGIS Maps SDK for JavaScript 4.28</title>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+
+  </style>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.28/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.28/"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/dist/js/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/dist/es/index.js"></script>
+
+
   <script>
-    require([
-      "esri/Map",
-      "esri/views/MapView",
-      "esri/layers/FeatureLayer"
-    ], function(Map, MapView, FeatureLayer) {
-      var map = new Map({
-        basemap: "streets-navigation-vector"
+    require(["esri/Map", "esri/layers/GraphicsLayer", "esri/Graphic", "esri/layers/GeoJSONLayer", "esri/views/MapView"], (
+      Map,
+      GraphicsLayer,
+      Graphic,
+      GeoJSONLayer,
+      MapView
+    ) => {
+      const url = "all_gen_figures/original_points.geojson";
+      const secondGeoJsonUrl = "all_gen_figures/all_attom_points.geojson";
+    
+      const template = {
+        title: "Progress Info",
+        content: "Address: {street_address} <br> City: {city} <br> State: {state} <br> Zipcode: {zip} <br> Longitude: {longitude} <br> Latitude: {latitude}"
+      };
+    
+      const renderer = {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: "green",
+          size: "5px",
+          outline: {
+            color: "white"
+          }
+        },
+        visualVariables: [{
+          type: "size",
+          field: "hide",
+          stops: [
+            { value: true, size: "0px" },
+            { value: false, size: "10px" }
+          ]
+        }]
+      };
+
+      const secondTemplate = {
+        title: "Attom Points Info",
+        content: "Address: {street_address} <br> City: {city} <br> State: {state} <br> Zipcode: {zip} <br> Longitude: {longitude} <br> Latitude: {latitude}"
+      };
+
+      const secondRenderer = {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: "red",
+          size: "5px",
+          outline: {
+            color: "white"
+          }
+        },
+        visualVariables: [{
+          type: "size",
+          field: "hide",
+          stops: [
+            { value: true, size: "0px" },
+            { value: false, size: "10px" }
+          ]
+        }]
+      };
+    
+      const geojsonLayer = new GeoJSONLayer({
+        url: url,
+        popupTemplate: template,
+        renderer: renderer
       });
 
-      var view = new MapView({
+      const secondGeojsonLayer = new GeoJSONLayer({
+        url: secondGeoJsonUrl,
+        popupTemplate: secondTemplate,
+        renderer: secondRenderer
+      });
+    
+      const map = new Map({
+        basemap: "gray-vector",
+        layers: [geojsonLayer, secondGeojsonLayer]
+      });
+    
+      const view = new MapView({
         container: "viewDiv",
-        map: map,
-        center: [-98.5795, 39.8283],
-        zoom: 4
+        center: [-115.3, 36.1],
+        zoom: 10,
+        map: map
       });
-
-      // Add your layers
-      var originalPointsLayer = new FeatureLayer({
-        url: "https://services6.arcgis.com/3tKBZy9r0mwAeNvJ/arcgis/rest/services/original_points_lv/FeatureServer"
+    
+      geojsonLayer.when(() => {
+        geojsonLayer.queryFeatures().then((features) => {
+          const points = {
+            type: "FeatureCollection",
+            features: features.features.map(f => f.geometry)
+          };
+          const concaveHull = turf.concave(points, { maxEdge: 1, units: 'kilometers' });
+    
+          const polygonGraphic = new Graphic({
+            geometry: concaveHull,
+            symbol: {
+              type: "simple-fill",
+              color: "rgba(0, 0, 255, 0.2)",
+              outline: {
+                color: "blue",
+                width: 2
+              }
+            }
+          });
+    
+          const graphicsLayer = new GraphicsLayer();
+          graphicsLayer.add(polygonGraphic);
+          map.add(graphicsLayer);
+        });
       });
-
-      map.add(originalPointsLayer);
-
     });
-  </script>
+    </script>
 </head>
+
 <body>
-  <div id="viewDiv" style="height: 600px; width: 100%;"></div>
+  <div id="viewDiv"></div>
 </body>
+
 </html>

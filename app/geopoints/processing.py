@@ -1,5 +1,7 @@
 import os
 import alphashape
+import traceback
+import logging
 import geopandas as gpd
 from decimal import Decimal
 from shapely.geometry import Point
@@ -17,15 +19,13 @@ class GeoprocessingManager:
         return points_within_polygon.drop(columns='index_right')
 
     def save_filtered_points(self, gdf_filtered_points, output_dir, filename):
-            """Save the filtered points to a GeoJSON file."""
-            for col in gdf_filtered_points.columns:
-                if gdf_filtered_points[col].apply(lambda x: isinstance(
-                    x, Decimal)).any():
-                    gdf_filtered_points[col] = gdf_filtered_points[col].apply(
-                        lambda x: float(x) if isinstance(x, Decimal) else x)
-            
-            output_path = os.path.join(output_dir, filename)
-            gdf_filtered_points.to_file(output_path, driver='GeoJSON')
+        """Save the filtered points to a GeoJSON file."""
+        for col in gdf_filtered_points.columns:
+            if gdf_filtered_points[col].apply(lambda x: isinstance(x, Decimal)).any():
+                gdf_filtered_points[col] = gdf_filtered_points[col].astype(float)
+        
+        output_path = os.path.join(output_dir, filename)
+        gdf_filtered_points.to_file(output_path, driver='GeoJSON')
 
     def generate_concave_hull(self, alpha):
         '''

@@ -16,6 +16,8 @@ class GeoDataFrameManager:
             geometry=[Point(data['longitude'], data['latitude']) for data in attom_data],
             crs='EPSG:4326'
         )
+        gdf_all_attom_points['hide'] = False
+        
         return gdf_all_attom_points
 
     @staticmethod
@@ -27,11 +29,13 @@ class GeoDataFrameManager:
     @staticmethod
     def create_gdf_from_data(data):
         """Create a GeoDataFrame from a list of data with longitude and latitude."""
-        return gpd.GeoDataFrame(
+        gdf = gpd.GeoDataFrame(
             data,
             geometry=[Point(float(record['longitude']), float(record['latitude'])) for record in data],
             crs="EPSG:4326"
         )
+        gdf['hide'] = False
+        return gdf
     
     @staticmethod
     def generate_concave_hull(gdf, alpha=1.0):

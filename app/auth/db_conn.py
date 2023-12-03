@@ -23,7 +23,7 @@ class DatabaseManager:
     def fetch_data_from_table(connection, table_name):
         try:
             cursor = connection.cursor(dictionary=True)
-            query = f"SELECT longitude, latitude FROM {table_name}"
+            query = f"SELECT street_address, city, state, zip, longitude, latitude FROM {table_name}"
             cursor.execute(query)
             results = cursor.fetchall()
             cursor.close()
@@ -45,5 +45,3 @@ class DatabaseManager:
     
     def upload_data(self, table_name, gdf):
         pass
-
-# Send Post request to 
